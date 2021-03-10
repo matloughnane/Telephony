@@ -13,7 +13,7 @@ import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
 import io.flutter.plugin.common.*
 
 
-public class TelephonyPlugin : FlutterPlugin, ActivityAware {
+class TelephonyPlugin : FlutterPlugin, ActivityAware {
 
   private lateinit var smsChannel: MethodChannel
 
@@ -23,14 +23,14 @@ public class TelephonyPlugin : FlutterPlugin, ActivityAware {
 
   private lateinit var binaryMessenger: BinaryMessenger
 
-  public TelephonyPlugin() {}
+  // public TelephonyPlugin() {}
 
-  public static void registerWith(Registrar registrar) {
-    TelephonyPlugin instance = new TelephonyPlugin();
-    instance.channel = new MethodChannel(registrar.messenger(), CHANNEL_TELEPHONY);
-    instance.context = registrar.context();
-    instance.channel.setMethodCallHandler(instance);
-  }
+  // public static void registerWith(Registrar registrar) {
+  //   TelephonyPlugin instance = new TelephonyPlugin();
+  //   instance.channel = new MethodChannel(registrar.messenger(), CHANNEL_TELEPHONY);
+  //   instance.context = registrar.context();
+  //   instance.channel.setMethodCallHandler(instance);
+  // }
 
   override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
     val isInForeground = IncomingSmsHandler.isApplicationForeground(flutterPluginBinding.applicationContext);
@@ -75,6 +75,26 @@ public class TelephonyPlugin : FlutterPlugin, ActivityAware {
   private fun tearDownPlugin() {
     IncomingSmsReceiver.foregroundSmsChannel = null
     smsChannel.setMethodCallHandler(null)
+  }
+
+  companion object {
+    var pluginRegistryCallback: PluginRegistry.PluginRegistrantCallback? = null
+
+    @JvmStatic
+    private fun registerTelephony(messenger: BinaryMessenger, ctx: Context) {
+        val channel = MethodChannel(messenger, CHANNEL_TELEPHONY)
+        channel.setMethodCallHandler(TelephonyPlugin().apply { telephonyCallHandler = TelephonyCallHandler(ctx) })
+    }
+
+    @JvmStatic
+    fun registerWith(registrar: PluginRegistry.Registrar) =
+            registerTelephony(registrar.messenger(), registrar.activeContext())
+
+    @Deprecated(message = "Use the Android v2 embedding method.")
+    @JvmStatic
+    fun setPluginRegistrantCallback(pluginRegistryCallback: PluginRegistry.PluginRegistrantCallback) {
+        TelephonyPlugin.pluginRegistryCallback = pluginRegistryCallback
+    }
   }
 
 }
