@@ -6,6 +6,7 @@ import android.provider.Telephony
 object Constants {
   
   // Channels
+  const val CHANNEL_TELEPHONY = "plugins.shounakmulay.com/telephony_channel"
   const val CHANNEL_SMS = "plugins.shounakmulay.com/foreground_sms_channel"
   const val CHANNEL_SMS_BACKGROUND = "plugins.shounakmulay.com/background_sms_channel"
 

@@ -23,6 +23,15 @@ public class TelephonyPlugin : FlutterPlugin, ActivityAware {
 
   private lateinit var binaryMessenger: BinaryMessenger
 
+  public TelephonyPlugin() {}
+
+  public static void registerWith(Registrar registrar) {
+    TelephonyPlugin instance = new TelephonyPlugin();
+    instance.channel = new MethodChannel(registrar.messenger(), CHANNEL_TELEPHONY);
+    instance.context = registrar.context();
+    instance.channel.setMethodCallHandler(instance);
+  }
+
   override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
     val isInForeground = IncomingSmsHandler.isApplicationForeground(flutterPluginBinding.applicationContext);
     if (!this::binaryMessenger.isInitialized && isInForeground) {
